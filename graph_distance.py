@@ -385,16 +385,7 @@ def findEdgePlacementStrong(p,c,epsilon):
          if not inEpsilonTube(lastVert,c.getEdge(),epsilon):
             # discard edge placement if both vertices of a degenerated starting placement are not inside the epsilon tube
             #CHECK: added double degenerated one-edge edge placements
-            degE = list(p.getEdges())[0]
-            if degE.isEdgeInPlacementOf(degE.getOtherVertex(lastVert)) and degE.getContainingPlacement(degE.getOtherVertex(lastVert)).isDegenerated():
-                if p.getMotherVertex() == c.getEdge().getV1():
-                    c.addV2Placement(degE.getContainingPlacement(degE.getOtherVertex(lastVert)))
-                    c.addV1Placement(p.getMotherVertex())
-                else:
-                    c.addV1Placement(degE.getContainingPlacement(degE.getOtherVertex(lastVert)))
-                    c.addV2Placement(p.getMotherVertex())
-                degE.getContainingPlacement(degE.getOtherVertex(lastVert)).addEdgePlacement(c)
-                p.getMotherVertex().addEdgePlacement(c)
+            return 1
 
 
     lastVert.setBorders(mappingBordersExp(lastVert,c.getEdge(),epsilon,p))
@@ -552,19 +543,19 @@ def constructEdgePlacementsStrong(f,g,epsilon):
                 p.removeEdgePlacement(c)
                 del c
         #==========================================================================================
-        # for degE in g.getEdges():
-        #     # traverse all edges of g
-        #     if degE.isEdgeInPlacementOf(e.getV1()) and degE.isEdgeInPlacementOf(e.getV2()):
-        #         # having a single edge cross both epsilon balls constructs a degenerated edge placement which hasn't been visited yet.
-        #         # This is because neither one of the incident vertices has a mapping on e. 
-        #         # CHECK: This spawns new edge placements all edges, which intersect with both epsilon balls. Those with incident vertices
-        #         # inside the epsilon balls are also considered, despite them having already been counted towards the regular placements. 
-        #         c = EdgePlacement(e)
-        #         c.addV1Placement(degE.getContainingPlacement(e.getV1()))
-        #         degE.getContainingPlacement(e.getV1()).addEdgePlacement(c)
-        #         c.addV2Placement(degE.getContainingPlacement(e.getV2()))
-        #         degE.getContainingPlacement(e.getV2()).addEdgePlacement(c)
-        #         e.addEdgePlacement(c)
+        for degE in g.getEdges():
+            # traverse all edges of g
+            if degE.isEdgeInPlacementOf(e.getV1()) and degE.isEdgeInPlacementOf(e.getV2()):
+                # having a single edge cross both epsilon balls constructs a degenerated edge placement which hasn't been visited yet.
+                # This is because neither one of the incident vertices has a mapping on e. 
+                # CHECK: This spawns new edge placements all edges, which intersect with both epsilon balls. Those with incident vertices
+                # inside the epsilon balls are also considered, despite them having already been counted towards the regular placements. 
+                c = EdgePlacement(e)
+                c.addV1Placement(degE.getContainingPlacement(e.getV1()))
+                degE.getContainingPlacement(e.getV1()).addEdgePlacement(c)
+                c.addV2Placement(degE.getContainingPlacement(e.getV2()))
+                degE.getContainingPlacement(e.getV2()).addEdgePlacement(c)
+                e.addEdgePlacement(c)
         #==========================================================================================
             f.unmarkEverything()
             g.unmarkEverything()
